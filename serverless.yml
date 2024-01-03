@@ -1,0 +1,40 @@
+component: http
+name: ailak
+inputs:
+  src:
+    dist: ./
+    hook: npm run build
+    exclude:
+      - .env
+  faas:
+    runtime: Nodejs18.15
+    framework: nextjs
+    name: '${name}'
+    eip: true
+    timeout: 3
+    memorySize: 512
+    tags: []
+    environments:
+      - key: STATIC_URL
+        value: >-
+          https://sls-cloudfunction-ap-singapore-code-1300931436.cos.ap-singapore.myqcloud.com
+    layers:
+      - name: '${output:${stage}:${app}:ailak-dev-layer.name}'
+        version: '${output:${stage}:${app}:ailak-dev-layer.version}'
+  apigw:
+    protocols:
+      - http
+      - https
+    timeout: 60
+    environment: release
+    customDomains: []
+  region: ap-singapore
+  isAutoCiDeploy: false
+  assets:
+    cos:
+      bucket: sls-cloudfunction-ap-singapore-code-1300931436
+      acl:
+        permissions: public-read
+org: '1300931436'
+app: ailak-dev
+stage: dev
